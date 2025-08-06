@@ -1,4 +1,5 @@
-import { WebSocketServer, WebSocket } from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
+
 import { IncomingMessage } from 'http';
 import jwt from 'jsonwebtoken';
 import { getDatabase } from './db/mongodb';
