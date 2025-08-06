@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Search, Heart, Menu, MapPin, ChevronDown, User, LogOut } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import { ROHTAK_AREAS } from "@shared/types";
+import { ROHTAK_AREAS } from "../../shared/types";
 
 export default function OLXStyleHeader() {
   const { user, isAuthenticated, logout } = useAuth();

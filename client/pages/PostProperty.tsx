@@ -26,7 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { ROHTAK_AREAS } from "@shared/types";
+import { ROHTAK_AREAS } from "../../shared/types";
 
 interface PropertyFormData {
   title: string;
