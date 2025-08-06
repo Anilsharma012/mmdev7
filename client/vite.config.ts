@@ -7,30 +7,12 @@ import copy from "rollup-plugin-copy";
 import { createServer } from "../server"; // adjust path if needed
 
 export default defineConfig({
-  root: path.resolve(__dirname), // ✅ root = client
+  root: path.resolve(__dirname),
   build: {
-    outDir: path.resolve(__dirname, "dist"), // ✅ inside client/dist
+    outDir: path.resolve(__dirname, "../dist/spa"), // ✅ dist/spa (match Netlify)
     emptyOutDir: true,
   },
-  plugins: [
-    react(),
-    expressPlugin(),
-    copy({
-      targets: [
-        {
-          src: path.resolve(__dirname, "public/_redirects"),
-          dest: path.resolve(__dirname, "dist"), // ✅ to client/dist
-        },
-      ],
-      hook: "writeBundle",
-    }),
-  ],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname),
-      "@shared": path.resolve(__dirname, "../shared"),
-    },
-  },
+  plugins: [react()],
 });
 
 function expressPlugin(): Plugin {
