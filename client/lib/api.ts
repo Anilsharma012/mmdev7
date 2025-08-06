@@ -14,10 +14,8 @@ const detectEnvironment = () => {
     return "fly";
   }
 
-  // Netlify deployment
-  if (hostname.includes(".netlify.app")) {
-    return "netlify";
-  }
+  
+  
 
   // Other production
   return "production";
@@ -25,52 +23,17 @@ const detectEnvironment = () => {
 
 // API Configuration
 const getApiBaseUrl = () => {
-  // Check for environment variable first
-  if (import.meta.env.VITE_API_BASE_URL) {
-    console.log(
-      "���� Using configured VITE_API_BASE_URL:",
-      import.meta.env.VITE_API_BASE_URL,
-    );
-    return import.meta.env.VITE_API_BASE_URL;
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+
+  if (envUrl && envUrl.startsWith("http")) {
+    console.log("✅ Using VITE_API_BASE_URL:", envUrl);
+    return envUrl;
   }
 
-  const environment = detectEnvironment();
-  console.log("🎯 Detected environment:", environment);
-
-  if (typeof window !== "undefined") {
-    const { protocol, hostname, port } = window.location;
-    console.log("📍 Current location:", {
-      protocol,
-      hostname,
-      port,
-      href: window.location.href,
-    });
-
-    switch (environment) {
-      case "development":
-        // Development: Vite proxy handles API requests
-        return "";
-
-      case "fly":
-        // Fly.dev: Backend and frontend on same domain, same port
-        return `${protocol}//${hostname}`;
-
-      case "netlify":
-        // Netlify: Use Netlify Functions
-        return "";
-
-      case "production":
-      default:
-        // Other production: Try same domain first, fallback to common ports
-        if (port && port !== "80" && port !== "443") {
-          return `${protocol}//${hostname}`;
-        }
-        return "";
-    }
-  }
-
+  // Optional fallback if needed (for localhost/dev only)
   return "";
 };
+
 
 const API_BASE_URL = getApiBaseUrl();
 const environment = detectEnvironment();
