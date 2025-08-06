@@ -7,12 +7,13 @@ import { ObjectId } from 'mongodb';
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-interface AuthenticatedWebSocket extends WebSocket {
+type AuthenticatedWebSocket = WebSocket & {
   userId?: string;
   userType?: string;
   conversationId?: string;
   isAlive?: boolean;
-}
+};
+
 
 interface WebSocketMessage {
   type: 'auth' | 'message' | 'typing' | 'handoff_request' | 'join_conversation' | 'leave_conversation';
@@ -43,34 +44,42 @@ export class ChatWebSocketServer {
     console.log('🔌 Chat WebSocket server initialized');
   }
 
-  private handleConnection(ws: AuthenticatedWebSocket, request: IncomingMessage) {
-    console.log('��� New WebSocket connection');
-    
+private handleConnection(wsRaw: WebSocket, request: IncomingMessage) {
+  const ws = wsRaw as WebSocket & {
+    userId?: string;
+    userType?: string;
+    conversationId?: string;
+    isAlive?: boolean;
+  };
+
+  console.log('🔌 New WebSocket connection');
+
+  ws.isAlive = true;
+
+  ws.on('pong', () => {
     ws.isAlive = true;
-    
-    ws.on('pong', () => {
-      ws.isAlive = true;
-    });
+  });
 
-    ws.on('message', (data: Buffer) => {
-      try {
-        const message: WebSocketMessage = JSON.parse(data.toString());
-        this.handleMessage(ws, message);
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-        this.sendError(ws, 'Invalid message format');
-      }
-    });
+  ws.on('message', (data: Buffer) => {
+    try {
+      const message: WebSocketMessage = JSON.parse(data.toString());
+      this.handleMessage(ws, message);
+    } catch (error) {
+      console.error('Error parsing WebSocket message:', error);
+      this.sendError(ws, 'Invalid message format');
+    }
+  });
 
-    ws.on('close', () => {
-      this.handleDisconnection(ws);
-    });
+  ws.on('close', () => {
+    this.handleDisconnection(ws);
+  });
 
-    ws.on('error', (error) => {
-      console.error('WebSocket error:', error);
-      this.handleDisconnection(ws);
-    });
-  }
+  ws.on('error', (error) => {
+    console.error('WebSocket error:', error);
+    this.handleDisconnection(ws);
+  });
+}
+
 
   private async handleMessage(ws: AuthenticatedWebSocket, message: WebSocketMessage) {
     switch (message.type) {
